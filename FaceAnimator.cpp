@@ -13,6 +13,8 @@ FaceAnimator::FaceAnimator(Adafruit_SSD1306* d) {
     winkPause  = random(20000, 40000);
 }
 
+/* ---------- DRAWING HELPERS ---------- */
+
 void FaceAnimator::drawEyesOpen() {
     display->fillRoundRect(32, 18, 20, 20, 6, WHITE);
     display->fillRoundRect(76, 18, 20, 20, 6, WHITE);
@@ -46,26 +48,24 @@ void FaceAnimator::drawFace() {
     }
 
     drawMouth();
-    display->display();
 }
+
+/* ---------- STARTUP ANIMATION ---------- */
 
 void FaceAnimator::startupAnimation() {
     display->clearDisplay();
     display->display();
     delay(500);
 
-    // Eyes appear
     drawEyesOpen();
     display->display();
     delay(700);
 
-    // Blink
     display->clearDisplay();
     drawEyesClosed();
     display->display();
     delay(300);
 
-    // Open again
     display->clearDisplay();
     drawEyesOpen();
     drawMouth();
@@ -73,13 +73,16 @@ void FaceAnimator::startupAnimation() {
     delay(400);
 }
 
+/* ---------- UPDATE ANIMATION ---------- */
+
 void FaceAnimator::update() {
     unsigned long now = millis();
 
-    // Random blink
+    // Blink
     if (now - lastBlink > blinkPause) {
         blinkState = true;
         drawFace();
+        display->display();
         delay(120);
 
         blinkState = false;
@@ -87,10 +90,11 @@ void FaceAnimator::update() {
         blinkPause = random(6000, 9000);
     }
 
-    // Random wink
+    // Wink
     if (now - lastWink > winkPause) {
         winkState = true;
         drawFace();
+        display->display();
         delay(200);
 
         winkState = false;
@@ -98,5 +102,7 @@ void FaceAnimator::update() {
         winkPause = random(20000, 40000);
     }
 
+    // Normal face
     drawFace();
+    display->display();
 }

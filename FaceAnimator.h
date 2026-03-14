@@ -1,6 +1,7 @@
 #ifndef FACE_ANIMATOR_H
 #define FACE_ANIMATOR_H
 
+#include <Arduino.h>
 #include <Adafruit_SSD1306.h>
 
 class FaceAnimator {
@@ -9,7 +10,6 @@ public:
 
     void startupAnimation();
     void update();
-    void drawFace();
 
 private:
     Adafruit_SSD1306* display;
@@ -26,6 +26,8 @@ private:
     unsigned long blinkPause;
     unsigned long winkPause;
 
+    // Internal drawing helpers
+    void drawFace();
     void drawEyesOpen();
     void drawEyesClosed();
     void drawWink();

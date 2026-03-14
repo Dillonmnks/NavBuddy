@@ -22,14 +22,20 @@ void NavigationDisplay::show(const String& dir, const String& dist, const String
 
     display->clearDisplay();
 
-    if (direction == "LEFT")       drawLeft();
-    else if (direction == "RIGHT") drawRight();
-    else if (direction == "STRAIGHT") drawStraight();
-    else if (direction == "ROUNDABOUT") drawRoundabout();
+    if (direction == "LEFT") {
+        drawLeft();
+    }
+    else if (direction == "RIGHT") {
+        drawRight();
+    }
+    else if (direction == "STRAIGHT") {
+        drawStraight();
+    }
+    else if (direction == "ROUNDABOUT") {
+        drawRoundabout();
+    }
 
     drawDistance();
-
-    display->display();
 }
 
 void NavigationDisplay::update() {
@@ -39,18 +45,38 @@ void NavigationDisplay::update() {
 /* ---------- DRAWING HELPERS ---------- */
 
 void NavigationDisplay::drawLeft() {
+    // Horizontal bar
     display->fillRect(25, 21, 35, 8, WHITE);
-    display->fillTriangle(10, 25, 28, 11, 28, 39, WHITE);
+
+    // Arrow head
+    display->fillTriangle(
+        10, 25,   // tip
+        28, 11,   // top
+        28, 39,   // bottom
+        WHITE
+    );
 }
 
 void NavigationDisplay::drawRight() {
     display->fillRect(68, 21, 35, 8, WHITE);
-    display->fillTriangle(118, 25, 100, 11, 100, 39, WHITE);
+
+    display->fillTriangle(
+        118, 25,  // tip
+        100, 11,  // top
+        100, 39,  // bottom
+        WHITE
+    );
 }
 
 void NavigationDisplay::drawStraight() {
     display->fillRect(60, 15, 8, 35, WHITE);
-    display->fillTriangle(64, 0, 50, 18, 78, 18, WHITE);
+
+    display->fillTriangle(
+        64, 0,    // tip
+        50, 18,   // left
+        78, 18,   // right
+        WHITE
+    );
 }
 
 void NavigationDisplay::drawRoundabout() {

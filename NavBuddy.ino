@@ -2,59 +2,63 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
-#include <BLEDevice.h>
-#include <BLEServer.h>
-#include <BLEUtils.h>
-#include <BLE2902.h>
-
+#include "AppState.h"
+#include "bBLEController.h"
 #include "FaceAnimator.h"
 #include "NavigationDisplay.h"
 #include "BLEStatus.h"
-#include "BLEHandlers.h"
 
-// OLED
-Adafruit_SSD1306 display(128, 64, &Wire, -1);
+// -------------------- OLED SETUP --------------------
 
-// Global modules
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
+
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
+
+// -------------------- GLOBAL MODULES --------------------
+
+AppState app;
+BLEController ble;
+
 FaceAnimator face(&display);
 NavigationDisplay nav(&display);
 BLEStatus bles(&display);
 
+// -------------------- SETUP --------------------
+
 void setup() {
     Serial.begin(115200);
+
     Wire.begin(21, 22);
 
-    display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+    if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+        Serial.println("SSD1306 init failed");
+        while (true);
+    }
+
     randomSeed(analogRead(0));
 
     face.startupAnimation();
 
-    // BLE
-    BLEDevice::init("ESP32_NAV_DISPLAY");
+    // Initialize BLE
+    ble.begin();
 
-    BLEServer *server = BLEDevice::createServer();
-    server->setCallbacks(new ServerCallbacks());
-
-    BLEService *service = server->createService("1234");
-
-    BLECharacteristic *navChar = service->createCharacteristic(
-        "ABCD",
-        BLECharacteristic::PROPERTY_WRITE
-    );
-
-    navChar->setCallbacks(new NavCallback());
-
-    service->start();
-
-    BLEAdvertising *advertising = BLEDevice::getAdvertising();
-    advertising->addServiceUUID("1234");
-    BLEDevice::startAdvertising();
+    Serial.println("System ready.");
 }
+
+// -------------------- LOOP --------------------
 
 void loop() {
     display.clearDisplay();
 
-    face.update();
+    // Decide what to draw based on app state
+    if (app.mode() == Mode::FACE) {
+        face.update();
+    } else {
+        nav.show(app.direction, app.distance, app.exitNum);
+    }
+
+    // Draw BLE connection indicator
     bles.draw();
 
     display.display();
